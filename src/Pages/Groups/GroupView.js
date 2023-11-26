@@ -59,7 +59,7 @@ const GroupView = () => {
       // e.preventDefault();
       try {
         const data = await groupBalanceSheet(id);
-        setBalanceSheet(data.data)
+        await setBalanceSheet(data.data)
       } catch (error) {
 
       }
@@ -166,17 +166,6 @@ const GroupView = () => {
       toast.error('Failed to add expense. Please try again.');
     }
   };
-  
-  const handleSettlement = async (From, To, Amount) => {
-    try {
-
-      await makeSettlement(id, From, To, Amount);
-      toast.success("Settlement Done")
-    }
-    catch (err) {
-      toast.error(err.message)
-    }
-  }
 
 
 
@@ -254,16 +243,7 @@ const GroupView = () => {
                           </Typography>
                         </div>
                         <div>
-                          {relationship[0] === user.email && (
-                            <Button
-                              variant="contained"
-                              color="secondary"
-                              style={{ background: '#9ad1d4', color: '#fff' }}
-                              onClick={() => handleSettlement(relationship[0], relationship[1], relationship[2])}
-                            >
-                              Settle
-                            </Button>
-                          )}
+            
 
                         </div>
                       </div>
