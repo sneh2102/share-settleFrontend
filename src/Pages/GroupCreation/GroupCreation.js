@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Select from 'react-select';
 import './GroupCreation.css';
 import Navbar from '../../Components/Navbar/Navbar';
 import { useNavigate } from 'react-router-dom';
@@ -33,16 +34,6 @@ const GroupCreation = () => {
     setSettlementPeriod(e.target.value);
   };
 
-  const addMember = (member) => {
-    if (member && !selectedMembers.includes(member)) {
-      setSelectedMembers([...selectedMembers, member]);
-    }
-  };
-
-  const deleteMember = (member) => {
-    setSelectedMembers(selectedMembers.filter((m) => m !== member));
-  };
-
   const handleCreateGroup = async (e) => {
     e.preventDefault();
 
@@ -58,6 +49,26 @@ const GroupCreation = () => {
       alert('Group creation failed. Please try again.');
     }
   };
+
+  const handleMembersChange = (selectedOptions) => {
+    const members = selectedOptions.map((option) => option.value);
+    
+    // Ensure the currently logged-in user is always included
+    if (!members.includes(user.email)) {
+      members.push(user.email);
+    }
+  
+    setSelectedMembers(members);
+  };
+
+
+
+  // Transform availableMembers into the format expected by react-select
+  const options = availableMembers.map((member) => ({
+    value: member.email,
+    label: member.email,
+    isDisabled: member.email === user.email, 
+  }));
 
   return (
     <>
@@ -80,31 +91,15 @@ const GroupCreation = () => {
               />
 
               <label htmlFor="members">Members</label>
-              <select
-                id="members"
-                className="field-input"
-                onChange={(e) => addMember(e.target.value)}
-                value=""
-              >
-                <option value="">Add Members</option>
-                {availableMembers.map((user, index) => (
-                  <option key={index} value={user.email}>
-                    {user.email}
-                  </option>
-                ))}
-              </select>
-              <div className="member-chips">
-                {selectedMembers.map((member, index) => (
-                  <div key={index} className="member-chip">
-                    {member}
-                    {member !== user.email && (
-                      <span className="chip-delete-btn" onClick={() => deleteMember(member)}>
-                        ×
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
+              <Select
+                isMulti
+                options={options}
+                onChange={handleMembersChange}
+                value={selectedMembers.map((member) => ({
+                  value: member,
+                  label: member,
+                }))}
+              />
 
               <div>
                 <label htmlFor="settlementPeriod">Settlement Period</label>
@@ -116,7 +111,7 @@ const GroupCreation = () => {
                   onChange={handleSettlementPeriodChange}
                 >
                   <option value="">Select Period</option>
-                  <option value="1 minute">60 second</option>
+                  <option value="3 minutes">3 minute</option>
                   <option value="1 week">Weekly</option>
                   <option value="2 weeks">Biweekly</option>
                   <option value="1 month">Monthly</option>
